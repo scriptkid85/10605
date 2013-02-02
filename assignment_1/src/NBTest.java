@@ -13,7 +13,7 @@ import java.util.Vector;
 public class NBTest {
 
   private static Hashtable<Vector<String>, Integer> traincounters = new Hashtable<Vector<String>, Integer>();
-
+  
   private static HashSet<String> vocabulary = new HashSet<String>();
 
   private static int traintotalcount = 0;

@@ -11,7 +11,7 @@ public class MyTrainertrain {
 
   private static Hashtable<Vector<String>, Integer> counters = new Hashtable<Vector<String>, Integer>();
 
-  private static int hashtablemaxsize = 100;
+  private static int hashtablemaxsize = 100000;
   
   private static int totalcount = 0;
   
@@ -38,15 +38,6 @@ public class MyTrainertrain {
       int value;
       BufferedWriter outputcounter = new BufferedWriter(new OutputStreamWriter(System.out));
     
-//      Vector<String> totalinstance = new Vector<String>();
-//      totalinstance.add("*");
-//      counters.put(totalinstance, numberofinstance);
-//      
-//      Vector<String> totalcounts = new Vector<String>();
-//      totalcounts.add("*");
-//      totalcounts.add("*");
-//      counters.put(totalcounts, totalcount);
-    
       for (Iterator<Vector<String>> it = counters.keySet().iterator(); it.hasNext();) {
         Vector<String> key = (Vector<String>) it.next();
         value = counters.get(key);
@@ -55,7 +46,7 @@ public class MyTrainertrain {
           outputcounter.flush();
         }
         else {
-          outputcounter.write(key.get(0) + "^" + key.get(1) + "\t" + value + "\n");
+          outputcounter.write(key.get(1) + "&" + key.get(0) + "\t" + value + "\n");
           outputcounter.flush();
         }
       }
@@ -108,6 +99,7 @@ public class MyTrainertrain {
       
       for(String label : labeltokens){
           
+        //Y = ANY
         tempkey = new Vector<String>();
         tempkey.add("*");
         if(counters.containsKey(tempkey))
@@ -117,6 +109,7 @@ public class MyTrainertrain {
           counters.put(tempkey, 1);
         }
 
+        //Y = label
         tempkey = new Vector<String>();
         tempkey.add(label);
         if(counters.containsKey(tempkey))

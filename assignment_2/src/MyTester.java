@@ -17,14 +17,8 @@ public class MyTester {
   private static Hashtable<Vector<String>, Integer> fixedTable = new Hashtable<Vector<String>, Integer>();
 
   private static HashSet<String> NEEDED = new HashSet<String>();
-  
-  private static HashSet<String> vocabulary = new HashSet<String>();
 
   private static long vocabularynum;
-  
-  private static int readin_num_threshold = 500;
-  
-  private static int traintotalcount = 0;
   
   private static String inputmodel;
   
@@ -87,64 +81,65 @@ public class MyTester {
       logprob += Math.log((countXY + alpha) / (double)(countYstar + alpha * vocabularynum));
       
     }
- //   logprob += Math.log((countY + alpha) / (double)(traintotalinstance + (alpha * labelnum)));
-    logprob += Math.log((countY) / (double)(traintotalinstance ));
+    logprob += Math.log((countY + alpha) / (double)(traintotalinstance + (alpha * labelnum)));
+   // logprob += Math.log((countY) / (double)(traintotalinstance ));
 
     return logprob;    
   }
   
-  //for test readhashtable
-  private static void outputCounter() throws IOException {
-    int value;
-    BufferedWriter outputcounter = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    for (Iterator<Vector<String>> it = TesttableC.keySet().iterator(); it.hasNext();) {
-      Vector<String> key = (Vector<String>) it.next();
-      value = TesttableC.get(key);
-      if (key.size() == 1) {
-        outputcounter.write(key.get(0) + "\t" + value + "\n");
-        outputcounter.flush();
-      } else {
-        outputcounter.write(key.get(0) + "\t" + key.get(1) + "\t" + value + "\n");
-        outputcounter.flush();
+  private static void initwithModel(){
+    Vector<String> tempkey = new Vector<String>();
+    try {
+      // Open the file that is the first
+      // command line parameter
+      BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+      String s;
+      String[] tokens, keys;
+      
+      while ((s = in.readLine()) != null) {
+        tokens = s.split("\t");
+        keys = tokens[0].split(" ");
+        if(keys[0].equals("*")){
+          tempkey = new Vector<String>();
+          tempkey.add("*");
+          if(keys.length == 2){
+            tempkey.add(keys[1]);
+            labelspace.add(keys[1]);
+          }
+          fixedTable.put(tempkey, Integer.parseInt(tokens[1]));
+        }
+        else if(keys.length == 1 && !keys[0].equals("*")){
+          if(keys[0].equals("vocabsize"))
+            vocabularynum = Integer.parseInt(tokens[1]);
+          else{
+            tempkey = new Vector<String>();
+            tempkey.add(keys[0]);
+            fixedTable.put(tempkey, Integer.parseInt(tokens[1]));
+          }
+        }
+        else if(keys.length == 2){
+          if(keys[0].equals("gable")){
+            int a = 1;
+          }
+          if(NEEDED.contains(keys[0])){
+            tempkey = new Vector<String>();
+            tempkey.add(keys[0]);
+            tempkey.add(keys[1]);
+            TesttableC.put(tempkey, Integer.parseInt(tokens[1]));
+          }
+        }
       }
+      tempkey.clear();
+      tempkey.add("*");
+      traintotalinstance = fixedTable.get(tempkey);
     }
-
+    catch(Exception e) {// Catch exception if any
+      System.err.println("Error: " + e.getMessage());
+    }
   }
 
-  
-//  private static void readHashtable() throws IOException {
-//    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-//    String s;
-//    String[] tokens;
-//    Vector<String> tempkey = new Vector<String>();
-//   
-//    while ((s = in.readLine()) != null && s.length() != 0) {
-//      tokens = s.split("\t");
-//      if (tokens.length == 2) {
-//        tempkey = new Vector<String>();
-//        tempkey.add(tokens[0]);
-//        TesttableC.put(tempkey, Integer.parseInt(tokens[1]));
-//      } else if (tokens.length == 3) {
-//        tempkey = new Vector<String>();
-//        tempkey.add(tokens[0]);
-//        tempkey.add(tokens[1]);
-//        TesttableC.put(tempkey, Integer.parseInt(tokens[2]));
-//        if(!vocabulary.contains(tokens[1]))
-//          vocabulary.add(tokens[1]);
-//      }
-//    }
-//    
-//    tempkey.clear();
-//    tempkey.add("*");
-//    traintotalinstance = TesttableC.get(tempkey);
-//    
-//    tempkey.clear();
-//    tempkey.add("*");
-//    tempkey.add("*");
-//    traintotalcount = TesttableC.get(tempkey);
-//  }
-  
+  //read model from file, for testing
   private static void initwithModel(String inputModel){
     Vector<String> tempkey = new Vector<String>();
     try {
@@ -289,16 +284,15 @@ public class MyTester {
 
   public static void main(String args[]) throws IOException {
     
-    if (args.length != 3 || !args[0].equals("-t")) {
-      System.out.println("usage: NBTest -t <inputTestFile> <inputModel>");
+    if (args.length != 2 || !args[0].equals("-t")) {
+      System.out.println("usage: MyTester -t <inputTestFile>");
       System.exit(0);
     }
     String inputfile = args[1];
-    inputmodel = args[2];
     
     readNEEDED(inputfile);
-    //initwithModel("model");
-    initwithModel(inputmodel);
+
+    initwithModel();
     
     updateCounter(inputfile);
     

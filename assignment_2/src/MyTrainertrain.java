@@ -46,7 +46,7 @@ public class MyTrainertrain {
           outputcounter.flush();
         }
         else {
-          outputcounter.write(key.get(1) + "&" + key.get(0) + "\t" + value + "\n");
+          outputcounter.write(key.get(1) + " " + key.get(0) + "\t" + value + "\n");
           outputcounter.flush();
         }
       }
@@ -93,7 +93,7 @@ public class MyTrainertrain {
     while ((s = in.readLine()) != null && s.length() != 0) {
       splitposition = s.indexOf("\t");
       labels = s.substring(0, splitposition);
-      content = s.substring(splitposition + 2,s.length());
+      content = s.substring(splitposition + 1, s.length());
       labeltokens = labels.split(",");
       contenttokens = tokenizeDoc(content);
       

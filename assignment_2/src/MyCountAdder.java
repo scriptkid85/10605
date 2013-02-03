@@ -39,7 +39,7 @@ public class MyCountAdder {
         sumForPreviousKey += Integer.parseInt(tokens[1]);
       }
       else{
-        keys = tokens[0].split("&");
+        keys = tokens[0].split(" ");
         if(keys.length == 2 && keys[0].equals("*")){
           if(!keys[1].equals(prelabel)){
             prelabel = keys[1];
@@ -94,7 +94,7 @@ public class MyCountAdder {
           sumForPreviousKey += Integer.parseInt(tokens[1]);
         }
         else{
-          keys = tokens[0].split("&");
+          keys = tokens[0].split(" ");
           if(keys.length == 2 && keys[0].equals("*")){
             if(!keys[1].equals(prelabel)){
               prelabel = keys[1];

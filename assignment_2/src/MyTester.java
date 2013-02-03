@@ -87,7 +87,8 @@ public class MyTester {
       logprob += Math.log((countXY + alpha) / (double)(countYstar + alpha * vocabularynum));
       
     }
-    logprob += Math.log((countY + alpha) / (double)(traintotalinstance + (alpha * labelnum)));
+ //   logprob += Math.log((countY + alpha) / (double)(traintotalinstance + (alpha * labelnum)));
+    logprob += Math.log((countY) / (double)(traintotalinstance ));
 
     return logprob;    
   }
@@ -158,7 +159,7 @@ public class MyTester {
       
       while ((s = br.readLine()) != null) {
         tokens = s.split("\t");
-        keys = tokens[0].split("&");
+        keys = tokens[0].split(" ");
         if(keys[0].equals("*")){
           tempkey = new Vector<String>();
           tempkey.add("*");
@@ -177,6 +178,17 @@ public class MyTester {
             fixedTable.put(tempkey, Integer.parseInt(tokens[1]));
           }
         }
+        else if(keys.length == 2){
+          if(keys[0].equals("gable")){
+            int a = 1;
+          }
+          if(NEEDED.contains(keys[0])){
+            tempkey = new Vector<String>();
+            tempkey.add(keys[0]);
+            tempkey.add(keys[1]);
+            TesttableC.put(tempkey, Integer.parseInt(tokens[1]));
+          }
+        }
       }
       tempkey.clear();
       tempkey.add("*");
@@ -187,35 +199,35 @@ public class MyTester {
     }
   }
   
-  private static void readHashtable(String inputModel){
-    TesttableC.clear();
+  private static void readNEEDED(String inputfile){
     try {
       // Open the file that is the first
       // command line parameter
-      FileInputStream fstream = new FileInputStream(inputModel);
+      FileInputStream fstream = new FileInputStream(inputfile);
       // Get the object of DataInputStream
       DataInputStream in = new DataInputStream(fstream);
       BufferedReader br = new BufferedReader(new InputStreamReader(in));
-      String s;
-      String[] tokens, keys;
-      Vector<String> tempkey = new Vector<String>();
+      String s, content;
+      int splitposition;
+      // Read File Line By Line
       while ((s = br.readLine()) != null) {
-        tokens = s.split("\t");
-        keys = tokens[0].split("&");
-        if (keys.length == 2 && NEEDED.contains(keys[0])) {
-          tempkey = new Vector<String>();
-          tempkey.add(keys[0]);
-          tempkey.add(keys[1]);
-          TesttableC.put(tempkey, Integer.parseInt(tokens[1]));
+        splitposition = s.indexOf("\t");
+        content = s.substring(splitposition + 1,s.length());
+        Vector<String> neededfeathers = tokenizeDoc(content);
+
+        //read in the counters according to the example  
+        
+        for(String str: neededfeathers){
+          NEEDED.add(str);
         }
       }
-    }
-    catch(Exception e) {// Catch exception if any
-      System.err.println("Error!!: " + e.getMessage());
+      br.close();
+      in.close();
+    }catch(Exception e){
+      System.err.println("Error in readNEEDED: " + e.getMessage());
     }
   }
 
-  
 
   private static void updateCounter(String inputfile) throws IOException {
     
@@ -235,63 +247,20 @@ public class MyTester {
       BufferedReader br2 = new BufferedReader(new InputStreamReader(in2));
       
       
-      String s, s2, labels, content;
+      String s, labels, content;
       int splitposition;
       // Read File Line By Line
       int readcounter = 0;
       while ((s = br.readLine()) != null) {
         readcounter ++;     
         testtotalinstance ++;
-
         splitposition = s.indexOf("\t");
+        labels = s.substring(0, splitposition);
         content = s.substring(splitposition + 1,s.length());
-        Vector<String> neededfeathers = tokenizeDoc(content);
-
-        //read in the counters according to the example  
-        
-        for(String str: neededfeathers){
-          NEEDED.add(str);
-        }
-        
-        if(readcounter > readin_num_threshold){
-          readHashtable("model");
-          while((s2 = br2.readLine()) != null && readcounter > 0){
-            readcounter --;
-            logprob = -Double.MAX_VALUE;
-            maxlogprob = -Double.MAX_VALUE;
-            String resultlabel = new String();
-            splitposition = s2.indexOf("\t");
-            labels = s2.substring(0, splitposition);
-            content = s2.substring(splitposition + 1, s2.length());
-            Vector<String> feathers = tokenizeDoc(content);
-            
-            for(String label: labelspace){
-              logprob = computeLogprob(feathers, label);
-              if(maxlogprob < logprob){
-                maxlogprob = logprob;
-                resultlabel = label;
-              }
-            }
-            for(String label: labels.split(",")){
-              if(label.equals(resultlabel)){
-                correctness ++;
-                break;
-              }
-            }
-            System.out.println("[" + labels + "]" + "\t" + resultlabel + "\t" + maxlogprob);
-          }
-          NEEDED.clear();
-        }
-        
-     }
-      while((s2 = br2.readLine() ) != null  && readcounter > 0 ){
-        readcounter --;
         logprob = -Double.MAX_VALUE;
         maxlogprob = -Double.MAX_VALUE;
         String resultlabel = new String();
-        splitposition = s2.indexOf("\t");
-        labels = s2.substring(0, splitposition);
-        content = s2.substring(splitposition + 2,s2.length());
+        splitposition = s.indexOf("\t");
         Vector<String> feathers = tokenizeDoc(content);
         
         for(String label: labelspace){
@@ -308,17 +277,13 @@ public class MyTester {
           }
         }
         System.out.println("[" + labels + "]" + "\t" + resultlabel + "\t" + maxlogprob);
-      }
-      
-      
-      
+
+        }
       // Close the input stream
-      br2.close();
-      in2.close();
       br.close();
       in.close();
     } catch (Exception e) {// Catch exception if any
-      System.err.println("Error2: " + e.getMessage());
+      System.err.println("Error in updateCounter: " + e.getMessage());
     }
   }
 
@@ -330,13 +295,14 @@ public class MyTester {
     }
     String inputfile = args[1];
     inputmodel = args[2];
-
+    
+    readNEEDED(inputfile);
     //initwithModel("model");
     initwithModel(inputmodel);
     
     updateCounter(inputfile);
     
-    System.out.println("Percent correct: " + correctness + "/" + testtotalinstance + "=" + (correctness / (double)testtotalinstance) + "%");
+    System.out.println("Percent correct: " + correctness + "/" + testtotalinstance + "=" + (correctness / (double)testtotalinstance)*100 + "%");
   }
 
 }

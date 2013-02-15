@@ -32,6 +32,18 @@ public class MyCounterStep3 {
     s = in.readLine();
     outputcounter.write(s + "\n");
     outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
     
     
     s = in.readLine();

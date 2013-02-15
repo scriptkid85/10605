@@ -33,7 +33,18 @@ public class MyCounterStep2 {
     s = in.readLine();
     outputcounter.write(s + "\n");
     outputcounter.flush();
-    
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
+    s = in.readLine();
+    outputcounter.write(s + "\n");
+    outputcounter.flush();
     
     s = in.readLine();
     String preunigram = s.split("\t")[0]; 
